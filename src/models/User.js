@@ -73,4 +73,28 @@ const userSchema = new mongoose.Schema({
     }
 );
 
+// ------------- Schema Methods -----------------
+
+// ------- The schema method is to create a jwt token while logging in ----------------
+  userSchema.methods.getJWT = async function () {
+     const user = this;
+     const token = await jwt.sign({_id: user.id}, "DEV@Tinder$790", {
+        expiresIn: "7d",
+       });
+       return token;
+  };
+
+  
+//  --------- The schema method is to validate password entered by user to login ---------
+userSchema.methods.validatePassword = async function(passwordInputByUser) {
+    const user = this;
+    const passwordHash = user.password;
+    const isPasswordvalid = await bcrypt.compare(
+        passwordInputByUser, 
+        passwordHash);
+
+       return isPasswordvalid;
+};
+
 module.exports = mongoose.model("User", userSchema);
+

@@ -65,24 +65,27 @@ app.post("/signup", async (req,res) => {
     app.post("/login", async (req,res) => {
       try{
    
-        const {emailId} = req.body;
-      
-        const password = "aBC23@*d";
+        const {emailId,password} = req.body;
         const user = await User.findOne({emailId});
         if(!user) {
           throw new Error("Invalid email credentials")
         }
         //  -------- If email is present in DB, then check if password is entered correctly -----------
-        const isPasswordvalid = await bcrypt.compare(password, user.password);
+        // const isPasswordvalid = await bcrypt.compare(password, user.password);
+           
+          //  Go to User schema methods to check for user password validation
+          const isPasswordvalid = await user.validatePassword(password);
 
         if(!isPasswordvalid){
           throw new Error("Invalid password Credentials",);
-        } else {
+        } 
+        else {
 
 // --------------- Now its clear that the user is valid. So create jwt token and send it with cookies  ----------
-           const token = await jwt.sign({_id: user.id}, "DEV@Tinder$790", {
-            expiresIn: "7d",
-           });
+          //  const token = await jwt.sign({_id: user.id}, "DEV@Tinder$790", {
+          //   expiresIn: "7d",
+          //  });
+          const token = await User.getJWT();
           //  Send the token in response of login request by inserting it into the cookie
           res.cookie("token", token, {
             expires: new Date(Date.now() + 8 * 3600000),
@@ -104,7 +107,7 @@ app.get("/user", async (req,res) => {
         // const user = await User.findOne({});
         // if(!user){
         //     res.status(404).send("User not found");
-        // }
+        // } 
         // else{
         //     res.send(user);
         // }
