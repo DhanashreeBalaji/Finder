@@ -1,11 +1,14 @@
 const express = require("express");
 const app = express();
 
-
 const connectDB = require("./config/database");
 const User = require("./models/User");
-const bcrypt = require("bcrypt");
 const { validateSignUpData } = require("../utils/validation");
+ const {userAuth} = require ("../middleware/auth") ;
+
+const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require ("jsonwebtoken"); 
 
 // The connectDB() returns a promise so then and catch is required
 connectDB()
@@ -18,17 +21,17 @@ connectDB()
 .catch((err) => {
     console.error("Database connection failed...")
 });
+
  app.use(express.json());
+ app.use(cookieParser());
 
 //  ---------- SIGNUP API ----------  Encrypting password ------------
 app.post("/signup", async (req,res) => {  
 
-  //  --------- Validating the user Input ---------
-
-    validateSignUpData(req);
+  try{
+  //  --------- Validating the user Input --------
 
     //  const {firstName,lastName,emailId,password} = req.body;
-
     //  if(!firstName || !lastName) {
     //   throw new Error ("Name is not valid");
     //  } else if (!validator.isEmail(emailId)) {
@@ -36,8 +39,9 @@ app.post("/signup", async (req,res) => {
     //  } else if (!validator.isStrongPassword(password)) {
     //   throw new Error ("Please enter a Strong password")
     //  }
-       
-        try{
+               //  --------- Validating the user Input ---------
+          validateSignUpData(req);
+
           const data = req.body;
           const {firstName, lastName,emailId,password} = data;
           // ------------ First Encrypt password then store in DB --------------
@@ -60,18 +64,31 @@ app.post("/signup", async (req,res) => {
  //  ---------lOGIN API ----------- 
     app.post("/login", async (req,res) => {
       try{
-        const {emailId, password} = req.body;
-        const user = await User.findOne({email: emailId});
+   
+        const {emailId} = req.body;
+      
+        const password = "aBC23@*d";
+        const user = await User.findOne({emailId});
         if(!user) {
-          throw new Error("Invalid credentials")
+          throw new Error("Invalid email credentials")
         }
         //  -------- If email is present in DB, then check if password is entered correctly -----------
-        const isPasswordvalid = await bcrypt.compare(password,user.password);
+        const isPasswordvalid = await bcrypt.compare(password, user.password);
 
         if(!isPasswordvalid){
-          throw new Error("Invalid Credentials");
+          throw new Error("Invalid password Credentials",);
         } else {
+
+// --------------- Now its clear that the user is valid. So create jwt token and send it with cookies  ----------
+           const token = await jwt.sign({_id: user.id}, "DEV@Tinder$790", {
+            expiresIn: "7d",
+           });
+          //  Send the token in response of login request by inserting it into the cookie
+          res.cookie("token", token, {
+            expires: new Date(Date.now() + 8 * 3600000),
+          } )
           res.send("Login Successful")
+          // ----------------------------------------------
         }
 
       } catch(err) {
@@ -80,11 +97,10 @@ app.post("/signup", async (req,res) => {
     })
   
 
-
-
 app.get("/user", async (req,res) => {
-    const email = req.body.email;
-    try{
+   
+
+   try{
         // const user = await User.findOne({});
         // if(!user){
         //     res.status(404).send("User not found");
@@ -101,25 +117,79 @@ app.get("/user", async (req,res) => {
         // else{
         //     res.send(user);
         // }
- 
 
-          const userId = null;
-        const user = await User.findById(userId, 'firstName lastName');
-        if(!user){
-            res.status(404).send("User not found");
-        }
-        else{
-            res.send(user);
-        }
+//  ---------------------- After user authentication only the data will be given to the requesting user -------------
+//  ------------------------ For that verify the token from incoming cookie ---------------------
+        
+        // const {token} = req.cookies;
+        // if(!token) {
+        //   throw new Error("Token is not valid!!!!!!!!!");
+        // }
+        //  Get the userId from the Token
+          //  const decodedObj = await jwt.verify(token, "DEV@Tinder$790");
+          //  const{_id} = decodedObj;
+
+//  Check if such a user is present in database by extracting the userId from the token -------
+        // const userId = null;
+        // const user = await User.findById(_id);
+        // if(!user){
+        //     res.status(404).send("User not found");
+        // }
+        // else {
+        //   //  If the token is valid send the response
+        //     res.send(user);
+        // }
+
+
+  
+
     } 
     catch(err){
         res.status(400).send("Something went wrong");
     }
     
 });
+
+app.get("/profile", userAuth, (req,res) => {
+  try{
+       const user = req.user;
+       res.send(user);
+  }  catch (err) {
+    res.status(400).send("ERROR : " + err.message);
+  }
+
+});
+
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+  const user = req.user;
+  // Sending a connection request         
+  console.log("Sending a connection request");
+
+  res.send(user.firstName + " sent the connect request!");
+});
+
 // Feed API - GET /feed - get all the users from the database
 app.get("/feed", async (req, res) => {
     try {
+
+      //  ------------- Veryfying Token for each API request -------------
+      
+
+      const {token} = req.cookies;
+        if(!token) {
+          throw new Error("Token is not valid!!!!!!!!!");
+        }
+           const decodedObj = await jwt.verify(token, "DEV@Tinder$790");
+           const{_id} = decodedObj;
+           const user = await User.findById(_id);
+           if(!user){
+               res.status(404).send("User not found");
+           }
+           else {
+               res.send(user);
+           }
+
+
       const users = await User.find({});
       res.send(users);
     } catch (err) {
