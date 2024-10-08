@@ -1,9 +1,11 @@
 const express = require("express");
 const app = express();
-import validator from "validator";
+
 
 const connectDB = require("./config/database");
 const User = require("./models/User");
+const bcrypt = require("bcrypt");
+const { validateSignUpData } = require("../utils/validation");
 
 // The connectDB() returns a promise so then and catch is required
 connectDB()
@@ -18,18 +20,67 @@ connectDB()
 });
  app.use(express.json());
 
+//  ---------- SIGNUP API ----------  Encrypting password ------------
 app.post("/signup", async (req,res) => {  
-        const data = req.body;
+
+  //  --------- Validating the user Input ---------
+
+    validateSignUpData(req);
+
+    //  const {firstName,lastName,emailId,password} = req.body;
+
+    //  if(!firstName || !lastName) {
+    //   throw new Error ("Name is not valid");
+    //  } else if (!validator.isEmail(emailId)) {
+    //   throw new Error ("Email is not valid")
+    //  } else if (!validator.isStrongPassword(password)) {
+    //   throw new Error ("Please enter a Strong password")
+    //  }
+       
         try{
-     const {emailid} = data;
-      
-          const user = new User(data)
+          const data = req.body;
+          const {firstName, lastName,emailId,password} = data;
+          // ------------ First Encrypt password then store in DB --------------
+            const passwordHash = await bcrypt.hash(password,10);
+            console.log(passwordHash)
+            // ----------- Creating a new Instance of the User Model in database-----------
+          const user = new User({
+            firstName,
+            lastName,
+            emailId,
+            password:passwordHash
+          });
           await user.save();
           res.send("User Saved")
        } catch(err){
-        res.status(400).send("Error saving the user:" + err.message);
+        res.status(400).send("Error registering the user: " + err.message);
     }
 })
+
+ //  ---------lOGIN API ----------- 
+    app.post("/login", async (req,res) => {
+      try{
+        const {emailId, password} = req.body;
+        const user = await User.findOne({email: emailId});
+        if(!user) {
+          throw new Error("Invalid credentials")
+        }
+        //  -------- If email is present in DB, then check if password is entered correctly -----------
+        const isPasswordvalid = await bcrypt.compare(password,user.password);
+
+        if(!isPasswordvalid){
+          throw new Error("Invalid Credentials");
+        } else {
+          res.send("Login Successful")
+        }
+
+      } catch(err) {
+        res.status(400).send("ERROR : " + err.message);
+      }
+    })
+  
+
+
 
 app.get("/user", async (req,res) => {
     const email = req.body.email;
