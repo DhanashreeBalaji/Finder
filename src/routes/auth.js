@@ -4,7 +4,7 @@ const authRouter = express.Router();
 const User = require("../models/User")
 
 const {validateSignUpData} = require("../utils/validation")
-
+const bcrypt = require("bcrypt");
 
 
 //  ---------- SIGNUP API 
@@ -69,5 +69,15 @@ authRouter.post("/signup", async (req,res) => {
           res.status(400).send("ERROR : " + err.message);
         }
       })
+
+//    ----------- LOGOUT API -----------
+authRouter.post("/logout", async(req,res) => {
+//  Cleanup activities are done here
+
+    res.cookie("token", null, {
+        expires: new Date(Date.now()),
+      }) 
+      .send("Logout Successful")
+})
 
       module.exports = authRouter;

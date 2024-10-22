@@ -6,12 +6,13 @@ const User = require("./models/User");
 const { validateSignUpData } = require("./utils/validation");
  const {userAuth} = require ("./middleware/auth") ;
 
-const bcrypt = require("bcrypt");
+
 const cookieParser = require("cookie-parser");
 const jwt = require ("jsonwebtoken"); 
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile")
 const requestRouter = require("./routes/request")
+const userRouter =  require("./routes/user")
 
 // The connectDB() returns a promise so then and catch is required
 connectDB()
@@ -33,6 +34,7 @@ connectDB()
 app.use("/",authRouter);
 app.use("/",profileRouter);
 app.use("/",requestRouter);
+app.use("/",userRouter)
 
 
 
