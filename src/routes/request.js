@@ -5,6 +5,7 @@ const ConnectionRequest = require("../models/connectionRequest")
 
 const {userAuth} = require ("../middleware/auth") ;
 
+//  ------------------- Right swipe or left swipe a user in feed -------------------
   requestRouter.post("/request/send/:status/:toUserId" , userAuth, async(req,res) => {
       try{
         // from user id is logged in user
@@ -60,7 +61,7 @@ const {userAuth} = require ("../middleware/auth") ;
      }
   );
 
-  // ---------------------- Review if the request is accepted or rejected for a incoming request ----------------------
+  // ---------------------- Make the request as accepted or rejected for a incoming request in database----------------------
 
   requestRouter.post("/request/review/:status/:requestId", userAuth, async (req,res) => {
           try{

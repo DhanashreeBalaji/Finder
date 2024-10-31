@@ -49,7 +49,7 @@ userRouter.get("/user/connections", userAuth, async (req,res)=> {
 
     //  From each row (of connectionrequestModel ka each document) you are returning the from userid details or to userId details, nothing else like status of the request.
        const data = matches.map((row) => {
-     if(row.fromUserId._id.toString() === loggedInUser._id){
+     if(row.fromUserId._id.toString() === loggedInUser._id.toString()){
         return row.toUserId;
      }
         return row.fromUserId;
@@ -70,7 +70,7 @@ userRouter.get("/feed", userAuth, async (req,res) => {
 
            const loggedInUser = req.user;
             //  Adding Pagination
-           const page = parseint(req.query.page) || 1;
+           const page = parseInt(req.query.page) || 1;
            let limit = parseInt(req.query.limit) || 10;
            limit = limit>50 ? 50 : limit;
            const skip = (page-1) * 10;
@@ -92,7 +92,7 @@ userRouter.get("/feed", userAuth, async (req,res) => {
           hideUsersFromFeed.add(req.toUserId.toString());
         });
     
-        //  Leaving these people suggestions of other Tinder users should be selected
+//  Leaving these people suggestions of other Tinder users should be selected
 //  Now the user list is fetched from DB but based on some conditions. 
 //  skip will function everytime depending on page number and it will skip many users from starting and fetch the remaining based on the limit given. 
 //  Also only those details of the user is given to frontend, through select methood we are limiting the data send to frontend.

@@ -17,7 +17,7 @@ authRouter.post("/signup", async (req,res) => {
             const {firstName, lastName,emailId,password} = data;
             // ------------ First Encrypt password then store in DB --------------
               const passwordHash = await bcrypt.hash(password,10);
-              console.log(passwordHash)
+            
               // ----------- Creating a new Instance of the User Model in database-----------
             const user = new User({
               firstName,
@@ -25,8 +25,13 @@ authRouter.post("/signup", async (req,res) => {
               emailId,
               password:passwordHash
             });
-            await user.save();
-            res.send("User Saved")
+            // savedUser will be the db returned object
+            const savedUser = await user.save();
+            const token = await user.getJWT();
+             res.cookie("token", token, {
+              expires: new Date(Date.now() + 8 * 3600000),
+            } )
+            res.json({ message: "User Added successfully!", data: savedUser });
          } catch(err){
           res.status(400).send("Error registering the user: " + err.message);
       }
@@ -52,17 +57,17 @@ authRouter.post("/signup", async (req,res) => {
           } 
           else {
   
-  // --------------- Now its clear that the user is valid. So create jwt token and send it with cookies  ----------
+            // --------------- Now its clear that the user is valid. So create jwt token and send it with cookies  ----------
             //  const token = await jwt.sign({_id: user.id}, "DEV@Tinder$790", {
             //   expiresIn: "7d",
             //  });
+
             const token = await user.getJWT();
             //  Send the token in response of login request by inserting it into the cookie
             res.cookie("token", token, {
               expires: new Date(Date.now() + 8 * 3600000),
             } )
-            res.send("Login Successful")
-            // ----------------------------------------------
+            res.send(user)
           }
   
         } catch(err) {

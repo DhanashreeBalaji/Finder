@@ -16,17 +16,19 @@ profileRouter.get("/profile/view", userAuth, (req,res) => {
   });
 
 //    --------- Profile Edit API --------------------
-  profileRouter.patch("/profile/edit", userAuth, async(req,res) => {
-    //  First Data validation and Datat Sanitization
+  profileRouter.post("/profile/edit", userAuth, async(req,res) => {
+
+    //  First Data validation and Data Sanitization
     //  Dont trust req.body and user input
-    // Allow only selected fields to be edited by user
+    //  Allow only selected fields to be edited by user
+
    try{
     if(!validateEditProfileData(req)){
-        throw new Error("Invalid Edit request")
+      res.status(400).send("ERROR: Invalid Request");
     }
       const loggedInUser = req.user;
     //   Updation with new value for each key
-    Object.keys(req.body).forEach((key) => loggedInUser[key] = req.body[key]);
+    Object.keys(req.body).forEach((key) => (loggedInUser[key] = req.body[key]));
     // Save in DB
     await loggedInUser.save();
 
@@ -36,7 +38,8 @@ profileRouter.get("/profile/view", userAuth, (req,res) => {
     });
 
    } catch(err) {
-      res.status(400).send("ERROR: " + Error.message);
+      res.status(400).send("ERROR: " + err.message);
+    
    }
   });
 
