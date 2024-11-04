@@ -56,7 +56,7 @@ const {userAuth} = require ("../middleware/auth") ;
 
       } catch(err){
         res.status(400).send("ERROR: " + err.message);
-        console.log(err)
+        
       }
      }
   );
@@ -93,7 +93,7 @@ const {userAuth} = require ("../middleware/auth") ;
 
           } catch(err){
             res.status(400).send("ERROR: " + err.message);
-            console.log(err)
+           
           }
   });
   

@@ -7,14 +7,14 @@ const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
         required: true,
-        minLength: 4,
-        maxLength: 50,
+        minLength: 3,
+        maxLength: 15,
     },
     lastName: {
         type:String,
         required: true,
-        minLength: 4,
-        maxLength: 50,
+        minLength: 1,
+        maxLength: 15,
     },
     emailId:{
         type:String,
@@ -46,7 +46,7 @@ const userSchema = new mongoose.Schema({
         type:String,
          // Custom validation function in schema
       validate(value) {
-    if(!["male","female","others"].includes(value)){
+    if(!["male","female","others"].includes(value.toLowerCase())){
         throw new Error("Gender data not valid")
     }
 },
@@ -54,15 +54,17 @@ const userSchema = new mongoose.Schema({
     photoUrl: {
         type: String,
         default: "https://geographyandyou.com/images/user-profile.png",
-        validate(value){ 
-            if(!validator.isURL(value)) {
-                throw new Error("Invalid Photo URL: " + value);
-            }
-        },
+        // validate(value){ 
+        //     if(!validator.isURL(value)) {
+        //         throw new Error("Invalid Photo URL: " + value);
+        //     }
+        // },
     },
     about:{
         type: String,
         default: "This is default about of user!",
+        minLength: 4,
+        maxLength: 200,
     },
     skills: {
         type: [String],
@@ -74,7 +76,7 @@ const userSchema = new mongoose.Schema({
     }
 );
 
-// ------------- Schema Methods -----------------
+                                            // ------------- Schema Methods -----------------
 
 // ------- The schema method is to create a jwt token while logging in ----------------
   userSchema.methods.getJWT = async function () {

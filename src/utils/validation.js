@@ -23,10 +23,8 @@ const validateEditProfileData = (req) => {
         "about",
      ];
     //  Check all the fields of the input request and compare with allowedEditFields in one go
-     const isEditAllowed = Object.keys(req.body).every((field) =>
-      allowedEditFields.includes(field)
-    );
-    return isEditAllowed;
+     const isEditAllowed = Object.keys(req.body).every( (field) =>  allowedEditFields.includes(field) );
+     return isEditAllowed;
 }
 
 module.exports = {

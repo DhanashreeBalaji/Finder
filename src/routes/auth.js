@@ -30,7 +30,7 @@ authRouter.post("/signup", async (req,res) => {
             const token = await user.getJWT();
              res.cookie("token", token, {
               expires: new Date(Date.now() + 8 * 3600000),
-            } )
+            })
             res.json({ message: "User Added successfully!", data: savedUser });
          } catch(err){
           res.status(400).send("Error registering the user: " + err.message);
@@ -38,13 +38,13 @@ authRouter.post("/signup", async (req,res) => {
   })
   
    //  ---------lOGIN API ----------- 
-      authRouter.post("/login", async (req,res) => {
+authRouter.post("/login", async (req,res) => {
         try{
      
           const {emailId,password} = req.body;
           const user = await User.findOne({emailId});
           if(!user) {
-            throw new Error("Invalid email credentials")
+            throw new Error("Invalid Credentials")
           }
           //  -------- If email is present in DB, then check if password is entered correctly -----------
           // const isPasswordvalid = await bcrypt.compare(password, user.password);
@@ -53,7 +53,7 @@ authRouter.post("/signup", async (req,res) => {
             const isPasswordvalid = await user.validatePassword(password);
   
           if(!isPasswordvalid){
-            throw new Error("Invalid password Credentials",);
+            throw new Error("Invalid Credentials",);
           } 
           else {
   

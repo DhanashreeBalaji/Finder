@@ -16,12 +16,11 @@ profileRouter.get("/profile/view", userAuth, (req,res) => {
   });
 
 //    --------- Profile Edit API --------------------
-  profileRouter.post("/profile/edit", userAuth, async(req,res) => {
+  profileRouter.patch("/profile/edit", userAuth, async (req,res) => {
 
     //  First Data validation and Data Sanitization
     //  Dont trust req.body and user input
     //  Allow only selected fields to be edited by user
-
    try{
     if(!validateEditProfileData(req)){
       res.status(400).send("ERROR: Invalid Request");
@@ -39,7 +38,6 @@ profileRouter.get("/profile/view", userAuth, (req,res) => {
 
    } catch(err) {
       res.status(400).send("ERROR: " + err.message);
-    
    }
   });
 
