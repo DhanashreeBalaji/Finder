@@ -11,7 +11,9 @@ const profileRouter = require("./routes/profile")
 const requestRouter = require("./routes/request")
 const userRouter =  require("./routes/user")
 
-
+const mongoose = require("mongoose");
+require("dotenv").config();
+const PORT = process.env.PORT || 7777 ;
 
 // The connectDB() returns a promise so then and catch is required
 connectDB()
