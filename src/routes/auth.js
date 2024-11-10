@@ -71,8 +71,7 @@ authRouter.post("/login", async (req,res) => {
             const options = {
               expires: new Date(Date.now() + 8 * 3600000),
               httpOnly:true,
-              secure:true,
-              sameSite:'none',
+            
             }
             res.cookie("token", token, options);
             res.send(user);
