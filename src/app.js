@@ -33,7 +33,9 @@ connectDB()
 //  app.use(cors);
 //  Whitelisting the origin domain name
  app.use(cors({
-    origin : "http://localhost:5173",
+    origin : "*",
+    methods: "*",
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
  }));
 
