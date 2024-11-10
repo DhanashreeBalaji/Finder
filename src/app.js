@@ -30,6 +30,13 @@ connectDB()
  app.use(express.json());
  app.use(cookieParser());
 
+ app.get("/", (req, res) => {
+	return res.json({
+		success:true,
+		message:'Your server is up and running....',
+	});
+});
+
 //  app.use(cors);
 //  Whitelisting the origin domain name
  app.use(cors({
