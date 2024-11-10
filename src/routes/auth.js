@@ -75,10 +75,7 @@ authRouter.post("/login", async (req,res) => {
               sameSite:'none',
             }
             res.cookie("token", token, options).status(200).json({
-              success: true,
-              token,
               user,
-              message: `User Login Success`,
             });
            
           }
