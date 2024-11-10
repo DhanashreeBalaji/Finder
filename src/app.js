@@ -42,15 +42,14 @@ connectDB()
  app.use(cors({
     origin : "https://finder-self.vercel.app",
     credentials: true,
+    
  }));
 
-
-//  ----------- Managing the Routes -------------- 
+ //  ----------- Managing the Routes -------------- 
 app.use("/",authRouter);
 app.use("/",profileRouter);
 app.use("/",requestRouter);
 app.use("/",userRouter)
-
 
 
 
