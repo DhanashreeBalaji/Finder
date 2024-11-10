@@ -40,7 +40,7 @@ connectDB()
 //  app.use(cors);
 //  Whitelisting the origin domain name
  app.use(cors({
-    origin : "finder-ashen-omega.vercel.app",
+    origin : "https://finder-ashen-omega.vercel.app",
     credentials: true,
  }));
 
