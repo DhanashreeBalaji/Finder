@@ -65,7 +65,7 @@ authRouter.post("/login", async (req,res) => {
             const token = await user.getJWT();
             //  Send the token in response of login request by inserting it into the cookie
             
-            user.token = token;
+            
             user.password = undefined;
 
             const options = {
@@ -74,9 +74,8 @@ authRouter.post("/login", async (req,res) => {
               secure:true,
               sameSite:'none',
             }
-            res.cookie("token", token, options).status(200).json({
-              user,
-            });
+            res.cookie("token", token, options);
+            res.send(user);
            
           }
   
